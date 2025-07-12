@@ -3,10 +3,12 @@
 const readline = require("readline");
 
 /**
- * 外部から選択ソート関数を受け取り、入力と実行を制御する
- * @param {Function} sortFn - 選択ソート関数
+ * マンガ棚の準備とソート実行
+ * @param {Function} sortFn - ソート関数（破壊的 or 非破壊的）
+ * @param {Object} options - 設定オプション
+ * @param {boolean} options.isImmutable - 元の配列を変更しないか
  */
-module.exports = function setupMangaShelf(sortFn) {
+module.exports = function setupMangaShelf(sortFn, { isImmutable = false } = {}) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -22,17 +24,16 @@ module.exports = function setupMangaShelf(sortFn) {
 
     const shelf = createShuffledShelf(count);
     console.log("今の本棚の並び:", shelf);
-    console.log("Enterキーを押すと、マンガの巻数順に並べ替えます。");
+    console.log("Enterキーを押すと、マンガの巻数順に並べ替えます（マージソート）");
 
     rl.once("line", () => {
-      sortFn(shelf); // ← main.js の selectionSort を実行
-      console.log("巻数順に整った本棚:", shelf);
+      const result = sortFn(shelf);
+      console.log("巻数順に整った本棚:", isImmutable ? result : shelf);
       rl.close();
     });
   });
 };
 
-// ヘルパー関数：シャッフルされたマンガ棚を生成
 function createShuffledShelf(count) {
   const shelf = Array.from({ length: count }, (_, i) => i + 1);
   return shuffle(shelf);
