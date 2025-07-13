@@ -1,22 +1,29 @@
 ```mermaid
 flowchart TD
-  A[スタート] --> B[お金を入れる]
-  A --> R[リセットボタンを押す]
-  R --> S[金額とメッセージを消す]
-  S --> B
+  Start[スタート]
 
-  B --> C[金額を表示する]
-  C --> D{商品ボタンを押した？}
+  %% 並列で可能なアクション
+  Start --> InsertMoney[お金を入れる]
+  Start --> PressReset[リセットを押す]
+  Start --> PressProduct[商品ボタンを押す]
 
-  D -- いいえ --> B
+  %% リセットの処理
+  PressReset --> ResetAll[金額とメッセージを消す]
+  ResetAll --> Start
 
-  D -- はい --> E{120円以上？}
+  %% お金を入れる処理
+  InsertMoney --> UpdateAmount[投入金額を更新]
+  UpdateAmount --> Start
 
-  E -- いいえ --> B
+  %% 商品ボタン押下処理
+  PressProduct --> EnoughMoney{120円以上ある？}
 
-  E -- はい --> F[商品を出す]
-  F --> G[おつりを出す]
-  G --> H[メッセージを表示する]
-  H --> I[投入金額を0円にする]
-  I --> B
+  EnoughMoney -- いいえ --> NoAction[何も起きない]
+  NoAction --> Start
+
+  EnoughMoney -- はい --> Purchase[商品を出す]
+  Purchase --> ReturnChange[おつりを出す]
+  ReturnChange --> ShowMessage[メッセージを表示]
+  ShowMessage --> ResetAmount[投入金額を0円にする]
+  ResetAmount --> Start
 ```
