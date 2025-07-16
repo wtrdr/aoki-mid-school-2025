@@ -132,6 +132,19 @@
       "レモン水", "ミルクティー", "スポドリ", "サイダー", "栄養ドリンク"
     ];
 
+    function getCurrentPrice() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const currentTime = hours * 60 + minutes;
+      const discountStartTime = 14 * 60 + 15; // 14:15 in minutes
+      
+      if (currentTime >= discountStartTime) {
+        return productPrice - 50;
+      }
+      return productPrice;
+    }
+
     function renderProducts() {
       productArea.innerHTML = "";
       products.forEach(name => {
@@ -148,12 +161,13 @@
 
         const button = document.createElement("button");
         button.className = "select-button";
-        button.textContent = `${productPrice}円`;
+        const currentPrice = getCurrentPrice();
+        button.textContent = `${currentPrice}円`;
         button.disabled = true;
 
         button.addEventListener("click", () => {
-          if (total >= productPrice) {
-            const change = total - productPrice;
+          if (total >= currentPrice) {
+            const change = total - currentPrice;
             statusDisplay.textContent = `${name} を購入しました。お釣りは ${change} 円です。`;
             total = 0;
             updateDisplay();
@@ -168,8 +182,10 @@
     }
 
     function updateButtons() {
+      const currentPrice = getCurrentPrice();
       document.querySelectorAll(".select-button").forEach(btn => {
-        if (total >= productPrice) {
+        btn.textContent = `${currentPrice}円`;
+        if (total >= currentPrice) {
           btn.classList.add("enabled");
           btn.disabled = false;
         } else {
@@ -180,7 +196,7 @@
     }
 
     function updateDisplay() {
-      insertedDisplay.textContent = `投入金額: ${total}円`;
+      insertedDisplay.textContent = `v2 投入金額: ${total}円`;
       updateButtons();
     }
 
